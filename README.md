@@ -8,13 +8,13 @@ and becoming harder to maintain or source. This approach upgrades the existing i
 
 ## Overview
 
-The system reads analogue control signals (0–10V) from a Niko 05-000-02 module and translates them into network-based commands for Shelly dimmers. This enables a classic electrical installation 
+The system reads analogue control signals (0–10V) from a Niko 05-007-02 module and translates them into network-based commands for Shelly dimmers. This enables a classic electrical installation 
 to be upgraded into a smart lighting system while preserving the existing control logic.
 
 Instead of directly dimming loads through analogue hardware, the Arduino acts as a bridge between the Niko control signals and IoT devices.
 ## How It Works
 
-1. A Niko 05-000-02 module generates analogue control values (0–10V equivalent of a 0–100% brightness range).
+1. A Niko 05-007-02 module generates analogue control values (0–10V equivalent of a 0–100% brightness range).
 
 2. The Arduino Opta reads these values via PLC variables.
 
@@ -55,7 +55,7 @@ This maps the analogue input range to a usable brightness percentage.
 
 - Software: Arduino PLC IDE
 
-- Input: Niko 05-000-02 module (0–10V equivalent signals)
+- Input: Niko 05-007-02 module (0–10V equivalent signals)
 
 - Output: HTTP RPC commands to Shelly 2PM Pro devices
 
