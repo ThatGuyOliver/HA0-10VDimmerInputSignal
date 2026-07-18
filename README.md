@@ -8,7 +8,7 @@ and becoming harder to maintain or source. This approach upgrades the existing i
 
 ## Overview
 
-The system reads analogue control signals (0–10V equivalent, scaled in software) from a Niko 05-000-02 module and translates them into network-based commands for Shelly dimmers. This enables a classic electrical installation 
+The system reads analogue control signals (0–10V) from a Niko 05-000-02 module and translates them into network-based commands for Shelly dimmers. This enables a classic electrical installation 
 to be upgraded into a smart lighting system while preserving the existing control logic.
 
 Instead of directly dimming loads through analogue hardware, the Arduino acts as a bridge between the Niko control signals and IoT devices.
@@ -76,7 +76,7 @@ The Arduino continuously:
   -The brightness changes beyond the hysteresis threshold.
 
 This minimizes network traffic and improves overall system stability.
-### Example Commands
+### Example Commands for Shelly Dimmer Control
 
 To set brightness:
 
@@ -92,27 +92,13 @@ To switch off:
 
 - Short HTTP timeouts prevent blocking behavior.
 
-## Use Cases
-
-- Retrofitting existing installations with smart lighting.
-
-- Bridging PLC-controlled systems with IoT devices.
-
-- Preserving industrial control logic while adding smart functionality.
-
-- Integration with systems like Home Assistant.
-
-- Adding diagnostics, logging, or remote monitoring.
-
 ## Future Improvements
 
 Shelly has recently released the Shelly Pro Sensor Add-on, which could potentially eliminate the need for the Arduino controller in this setup. This add-on is capable of directly reading analogue signals, 
 meaning the 0-10V inputs from the Niko system could be processed without an intermediate device.
 
 If this proves reliable, the architecture could be simplified significantly by allowing the Shelly Pro devices to handle both input and output functionality. 
-This would reduce system complexity, hardware cost, and points of failure.
-
-However, this approach has not yet been tested in this project, and further validation is required to confirm compatibility, accuracy, and responsiveness in a real-world installation.
+This would reduce system complexity and points of failure.
 
 ## Hurdles and Lessons Learned
 
