@@ -78,11 +78,11 @@ Example Commands
 
 To set brightness:
 
-/rpc/Light.Set?id=0&on=true&brightness=75
+    /rpc/Light.Set?id=0&on=true&brightness=75
 
 To switch off:
 
-/rpc/Light.Set?id=0&on=false
+    /rpc/Light.Set?id=0&on=false
 Reliability
 
     An 8-second watchdog timer ensures automatic recovery in case of failure.
@@ -105,16 +105,16 @@ Use Cases
 
 Future Improvements
 
-    Shelly has recently released the Shelly Pro Sensor Add-on, which could potentially eliminate the need for the Arduino controller in this setup. This add-on is capable of directly reading analogue signals, 
-    meaning the 0-10V inputs from the Niko system could be processed without an intermediate device.
+Shelly has recently released the Shelly Pro Sensor Add-on, which could potentially eliminate the need for the Arduino controller in this setup. This add-on is capable of directly reading analogue signals, 
+meaning the 0-10V inputs from the Niko system could be processed without an intermediate device.
 
-    If this proves reliable, the architecture could be simplified significantly by allowing the Shelly Pro devices to handle both input and output functionality. 
-    This would reduce system complexity, hardware cost, and points of failure.
+If this proves reliable, the architecture could be simplified significantly by allowing the Shelly Pro devices to handle both input and output functionality. 
+This would reduce system complexity, hardware cost, and points of failure.
 
-    However, this approach has not yet been tested in this project, and further validation is required to confirm compatibility, accuracy, and responsiveness in a real-world installation.
+However, this approach has not yet been tested in this project, and further validation is required to confirm compatibility, accuracy, and responsiveness in a real-world installation.
 
 Hurdles and Lessons Learned
 
-    One of the biggest challenges in this project was the very first upload of the program to the Arduino Opta. Getting the device into the correct state for programming was not straightforward, 
-    and this created a lot of frustration during the initial setup. The issue was eventually solved by using the Arduino Opta Factory Reset Tool. After restoring the device to a clean state, 
-    the program could be uploaded properly and the Opta started behaving as expected.
+One of the biggest challenges in this project was the very first upload of the program to the Arduino Opta. Getting the device into the correct state for programming was not straightforward, 
+and this created a lot of frustration during the initial setup. The issue was eventually solved by using the Arduino Opta Factory Reset Tool. After restoring the device to a clean state, 
+the program could be uploaded properly and the Opta started behaving as expected.
