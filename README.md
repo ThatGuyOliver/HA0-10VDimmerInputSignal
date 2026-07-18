@@ -1,12 +1,15 @@
 Smart 0–10V Dimmer Replacement with Arduino & Shelly 2PM PRO
 
-This project replaces a traditional Niko modular analogue dimmer (e.g. Niko Modular analogue dimmer, 0–10V input, 330-00701) by combining a PLC-based 0–10V control system with modern smart lighting using an Arduino-based controller and Shelly 2PM Pro devices.
+This project replaces a traditional Niko modular analogue dimmer (e.g. Niko Modular analogue dimmer, 0–10V input, 330-00701) by combining a PLC-based 0–10V control system with modern smart lighting using 
+an Arduino-based controller and Shelly 2PM Pro devices.
 
-The solution was chosen not only for its flexibility, but also because it is significantly more cost-effective than replacing or expanding the original Niko hardware. Additionally, many of these Niko modules are aging and becoming harder to maintain or source. This approach upgrades the existing installation into a smart, network-connected, and fully local system without requiring a complete redesign.
+The solution was chosen not only for its flexibility, but also because it is significantly more cost-effective than replacing or expanding the original Niko hardware. Additionally, many of these Niko modules are aging 
+and becoming harder to maintain or source. This approach upgrades the existing installation into a smart, network-connected, and fully local system without requiring a complete redesign.
 
 Overview
 
-The system reads analogue control signals (0–10V equivalent, scaled in software) from a Niko 05-000-02 module and translates them into network-based commands for Shelly dimmers. This enables a classic electrical installation to be upgraded into a smart lighting system while preserving the existing control logic.
+The system reads analogue control signals (0–10V equivalent, scaled in software) from a Niko 05-000-02 module and translates them into network-based commands for Shelly dimmers. This enables a classic electrical installation 
+to be upgraded into a smart lighting system while preserving the existing control logic.
 
 Instead of directly dimming loads through analogue hardware, the Arduino acts as a bridge between the Niko control signals and IoT devices.
 How It Works
@@ -102,12 +105,16 @@ Use Cases
 
 Future Improvements
 
-    Shelly has recently released the Shelly Pro Sensor Add-on, which could potentially eliminate the need for the Arduino controller in this setup. This add-on is capable of directly reading analogue signals, meaning the 0-10V inputs from the Niko system could be processed without an intermediate device.
+    Shelly has recently released the Shelly Pro Sensor Add-on, which could potentially eliminate the need for the Arduino controller in this setup. This add-on is capable of directly reading analogue signals, 
+    meaning the 0-10V inputs from the Niko system could be processed without an intermediate device.
 
-    If this proves reliable, the architecture could be simplified significantly by allowing the Shelly Pro devices to handle both input and output functionality. This would reduce system complexity, hardware cost, and points of failure.
+    If this proves reliable, the architecture could be simplified significantly by allowing the Shelly Pro devices to handle both input and output functionality. 
+    This would reduce system complexity, hardware cost, and points of failure.
 
     However, this approach has not yet been tested in this project, and further validation is required to confirm compatibility, accuracy, and responsiveness in a real-world installation.
 
 Hurdles and Lessons Learned
 
-    One of the biggest challenges in this project was the very first upload of the program to the Arduino Opta. Getting the device into the correct state for programming was not straightforward, and this created a lot of frustration during the initial setup. The issue was eventually solved by using the Arduino Opta Factory Reset Tool. After restoring the device to a clean state, the program could be uploaded properly and the Opta started behaving as expected.
+    One of the biggest challenges in this project was the very first upload of the program to the Arduino Opta. Getting the device into the correct state for programming was not straightforward, 
+    and this created a lot of frustration during the initial setup. The issue was eventually solved by using the Arduino Opta Factory Reset Tool. After restoring the device to a clean state, 
+    the program could be uploaded properly and the Opta started behaving as expected.
