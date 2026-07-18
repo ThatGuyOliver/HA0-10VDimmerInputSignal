@@ -14,15 +14,15 @@ to be upgraded into a smart lighting system while preserving the existing contro
 Instead of directly dimming loads through analogue hardware, the Arduino acts as a bridge between the Niko control signals and IoT devices.
 ## How It Works
 
-    A Niko 05-000-02 module generates analogue control values (0–10V equivalent of a 0–100% brightness range).
+1. A Niko 05-000-02 module generates analogue control values (0–10V equivalent of a 0–100% brightness range).
 
-    The Arduino Opta reads these values via PLC variables.
+2. The Arduino Opta reads these values via PLC variables.
 
-    Based on changes and hysteresis filtering, the Arduino sends HTTP commands over Ethernet.
+3. Based on changes and hysteresis filtering, the Arduino sends HTTP commands over Ethernet.
 
-    Shelly 2PM Pro devices receive these commands and adjust lighting accordingly.
+4. Shelly 2PM Pro devices receive these commands and adjust lighting accordingly.
 
-Signal Conversion Example
+### Signal Conversion Example
 
 The PLC converts raw signals into percentage values:
 
@@ -33,48 +33,48 @@ The PLC converts raw signals into percentage values:
 This maps the analogue input range to a usable brightness percentage.
 ## Key Features
 
-    Direct replacement for Niko analogue dimmers using existing wiring.
+- Direct replacement for Niko analogue dimmers using existing wiring.
 
-    Supports up to 8 channels with a base Arduino; expandable via additional modules.
+- Supports up to 8 channels with a base Arduino; expandable via additional modules.
 
-    Two dimmer channels per Shelly 2PM Pro device.
+- Two dimmer channels per Shelly 2PM Pro device.
 
-    DIN rail mountable components for clean electrical cabinet integration.
+- DIN rail mountable components for clean electrical cabinet integration.
 
-    Hysteresis filtering to reduce unnecessary network traffic.
+- Hysteresis filtering to reduce unnecessary network traffic.
 
-    Watchdog protection for improved reliability.
+- Watchdog protection for improved reliability.
 
-    Compatible with the Shelly RPC API.
+- Compatible with the Shelly RPC API.
 
-    Fully local operation (no cloud dependency).
+- Fully local operation (no cloud dependency).
 
 ## Architecture
 
-    Controller: Arduino Opta (Ethernet-based)
+- Controller: Arduino Opta (Ethernet-based)
 
-    Input: Niko 05-000-02 module (0–10V equivalent signals)
+- Input: Niko 05-000-02 module (0–10V equivalent signals)
 
-    Output: HTTP RPC commands to Shelly 2PM Pro devices
+- Output: HTTP RPC commands to Shelly 2PM Pro devices
 
-    Network: Local LAN with static IP configuration
+- Network: Local LAN with static IP configuration
 
 ## Software Logic
 
 The Arduino continuously:
 
-    Reads dimmer target values from PLC variables.
+- Reads dimmer target values from PLC variables.
 
-    Compares them with previous values using a hysteresis threshold.
+- Compares them with previous values using a hysteresis threshold.
 
-    Sends updates only when:
+- Sends updates only when:
 
-        The ON/OFF state changes, or
+  -The ON/OFF state changes, or
 
-        The brightness changes beyond the hysteresis threshold.
+  -The brightness changes beyond the hysteresis threshold.
 
 This minimizes network traffic and improves overall system stability.
-Example Commands
+### Example Commands
 
 To set brightness:
 
@@ -83,25 +83,24 @@ To set brightness:
 To switch off:
 
     /rpc/Light.Set?id=0&on=false
-##Reliability
+## Reliability
+- An 8-second watchdog timer ensures automatic recovery in case of failure.
 
-    An 8-second watchdog timer ensures automatic recovery in case of failure.
+- Ethernet connection is continuously maintained.
 
-    Ethernet connection is continuously maintained.
-
-    Short HTTP timeouts prevent blocking behavior.
+- Short HTTP timeouts prevent blocking behavior.
 
 ## Use Cases
 
-    Retrofitting existing installations with smart lighting.
+- Retrofitting existing installations with smart lighting.
 
-    Bridging PLC-controlled systems with IoT devices.
+- Bridging PLC-controlled systems with IoT devices.
 
-    Preserving industrial control logic while adding smart functionality.
+- Preserving industrial control logic while adding smart functionality.
 
-    Integration with systems like Home Assistant.
+- Integration with systems like Home Assistant.
 
-    Adding diagnostics, logging, or remote monitoring.
+- Adding diagnostics, logging, or remote monitoring.
 
 ## Future Improvements
 
