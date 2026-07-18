@@ -6,18 +6,21 @@
 
 mbed::Watchdog &watchdog = mbed::Watchdog::get_instance();
 
-EthernetClient ethernetClientDimmer1; //This is an object for 1 Shelly Dimmer 2PM 
+const uint16_t HYST = 3;
 
+ //This is for 1 Shelly Dimmer 2PM 
+
+EthernetClient ethernetClientDimmer1;
 
 HttpClient httpClientDimmer1(ethernetClientDimmer1, "IP Addres Dimmer Shelly", 80);
 
-const uint16_t HYST = 3;
+uint16_t lastBright11=0, lastBright12=0;
+bool dimmer11On=false, dimmer12On=false;
 
-uint16_t lastBright11=0, lastBright12=0, lastBright21=0, lastBright22=0;
-bool dimmer11On=false, dimmer12On=false, dimmer21On=false, dimmer22On=false;
+//Networking Arduino Opta
 
 IPAddress ip( ); //IP Addres Arduino Opta
-IPAddress dns(1,1,1,1); //CLOUDFLARE
+IPAddress dns(1,1,1,1); //CLOUDFLARE DNS
 IPAddress gateway( ); //Gateway/Router Addres 
 IPAddress subnet(255,255,255,0);
 
@@ -90,8 +93,8 @@ void loop()
 
     Ethernet.maintain();
 
-    handleDimmer(httpClientDimmer1, PLCOut.dimmer11Aansturing, lastBright11, dimmer11On, 0); //1st Channel Shelly 
-    handleDimmer(httpClientDimmer1, PLCOut.dimmer12Aansturing, lastBright12, dimmer12On, 1); //2nd Channel Shelly
+    handleDimmer(httpClientDimmer1, PLCOut.dimmer11Control, lastBright11, dimmer11On, 0); //1st Channel Shelly 
+    handleDimmer(httpClientDimmer1, PLCOut.dimmer12Control, lastBright12, dimmer12On, 1); //2nd Channel Shelly
 
     delay(100);
 }
