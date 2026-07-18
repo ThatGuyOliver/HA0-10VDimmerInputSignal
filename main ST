@@ -1,0 +1,8 @@
+//The code of the main program of the Arduino Opta
+//This is for 1 Shelly 2PM
+
+dimmer11Control := LIMIT( (signal1 * 100 / 60000), 0, 100 );
+dimmer12Control := LIMIT( (signal2 * 100 / 60000), 0, 100 );
+
+//signal1 & signal2 need to be add to the approriate inputs in the programmable Inputs of the Arduino with IOType Analog
+//The dimmer11Control & dimmer12Control have to be added toShared Variabeles, Output and type INT
