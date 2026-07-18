@@ -26,9 +26,9 @@ Instead of directly dimming loads through analogue hardware, the Arduino acts as
 
 The PLC converts raw signals into percentage values:
 
-    dimmer11Aansturing = LIMIT((signaal1 × 100 / 60000), 0, 100)
+    dimmer11Control = LIMIT((signal1 × 100 / 60000), 0, 100)
 
-    dimmer12Aansturing = LIMIT((signaal2 × 100 / 60000), 0, 100)
+    dimmer12Control = LIMIT((signal2 × 100 / 60000), 0, 100)
 
 This maps the analogue input range to a usable brightness percentage.
 ## Key Features
@@ -52,6 +52,8 @@ This maps the analogue input range to a usable brightness percentage.
 ## Architecture
 
 - Controller: Arduino Opta (Ethernet-based)
+
+- Software: Arduino PLC IDE
 
 - Input: Niko 05-000-02 module (0–10V equivalent signals)
 
@@ -114,6 +116,6 @@ However, this approach has not yet been tested in this project, and further vali
 
 ## Hurdles and Lessons Learned
 
-One of the biggest challenges in this project was the very first upload of the program to the Arduino Opta. Getting the device into the correct state for programming was not straightforward, 
+One of the biggest challenges in this project was the very first upload of the program to the Arduino Opta using the Arduino Opta PLC IDE. Getting the device into the correct state for programming was not straightforward, 
 and this created a lot of frustration during the initial setup. The issue was eventually solved by using the Arduino Opta Factory Reset Tool. After restoring the device to a clean state, 
 the program could be uploaded properly and the Opta started behaving as expected.
