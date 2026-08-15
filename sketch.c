@@ -6,101 +6,193 @@
 
 mbed::Watchdog &watchdog = mbed::Watchdog::get_instance();
 
-const uint16_t HYST = 3;
-
- //This is for 1 Shelly Dimmer 2PM 
+//Example for 2 Shelly Dimmers (4 Channels)
 
 EthernetClient ethernetClientDimmer1;
+EthernetClient ethernetClientDimmer2;
 
-HttpClient httpClientDimmer1(ethernetClientDimmer1, "IP Addres Dimmer Shelly", 80);
+static const IPAddress SHELLY1_IP(192, 168, XXX, XXX); //IP Shelly, Device IP should be static in device settings
+static const IPAddress SHELLY2_IP(192, 168, XXX, XXX);
 
-uint16_t lastBright11=0, lastBright12=0;
-bool dimmer11On=false, dimmer12On=false;
+HttpClient httpClientDimmer1(ethernetClientDimmer1, SHELLY1_IP, 80);
+HttpClient httpClientDimmer2(ethernetClientDimmer2, SHELLY2_IP, 80);
 
-//Networking Arduino Opta
+const uint16_t HYST = 3;
 
-IPAddress ip( ); //IP Addres Arduino Opta
-IPAddress dns(1,1,1,1); //CLOUDFLARE DNS
-IPAddress gateway( ); //Gateway/Router Addres 
-IPAddress subnet(255,255,255,0);
+static constexpr size_t URL_BUF_SIZE               = 80;
+static constexpr unsigned long HTTP_TIMEOUT_MS      = 2000;
+static constexpr unsigned long INTER_DIMMER_DELAY_MS = 10;
+static constexpr unsigned long LOOP_DELAY_MS        = 100;
+static constexpr unsigned long RECONNECT_DELAY_MS   = 2000;
+static constexpr uint8_t MAX_ERR_COUNT              = 255;
 
+uint16_t lastBright11 = 0, lastBright12 = 0, lastBright21 = 0, lastBright22 = 0;
+bool dimmer11On = false, dimmer12On = false, dimmer21On = false, dimmer22On = false;
+uint8_t errCount11 = 0, errCount12 = 0, errCount21 = 0, errCount22 = 0;
 
-// ----------------------------
-void sendRequest(HttpClient &client, const char *url)
+bool ethernetWasUp = false;
+bool forceDimmerSync = true;
+
+IPAddress ip(192, 168, XXX, XXX); //Static IP Adress Arduino Opta PLC 
+IPAddress gateway(192, 168, XXX, XXX); //IP Adress Router
+IPAddress subnet(255, 255, 255, 0);
+
+bool sendRequest(HttpClient &client, const char *url)
 {
-    client.get(url);
+    int result = client.get(url);
+
+    if (result < 0)
+    {
+        client.stop();
+        return false;
+    }
 
     int status = client.responseStatusCode();
 
-    unsigned long timeout = millis();
-
-    while (client.connected() && millis() - timeout < 500)
-    {
-        while (client.available())
-        {
-            client.read();
-            timeout = millis();
-        }
-    }
-
     client.stop();
+
+    return (status >= 200 && status < 300);
 }
 
-
-// ----------------------------
-void handleDimmer(
+bool handleDimmer(
     HttpClient &client,
     uint16_t target,
     uint16_t &lastBright,
     bool &dimmerOn,
-    int id)
+    int id,
+    uint8_t &errCount,
+    bool forceUpdate)
 {
     bool newOn = (target > 1);
     int diff = (int)target - (int)lastBright;
 
-    if (newOn != dimmerOn || (newOn && (diff > HYST || diff < -HYST)))
+    if (forceUpdate ||
+        newOn != dimmerOn ||
+        (newOn && (diff > HYST || diff < -HYST)))
     {
-        dimmerOn = newOn;
-        lastBright = target;
-
-        char url[80];
+        char url[URL_BUF_SIZE];
 
         if (newOn)
+        {
             snprintf(url, sizeof(url),
                      "/rpc/Light.Set?id=%d&on=true&brightness=%u",
                      id, target);
+        }
         else
+        {
             snprintf(url, sizeof(url),
                      "/rpc/Light.Set?id=%d&on=false",
                      id);
+        }
 
-        sendRequest(client, url);
+        bool ok = sendRequest(client, url);
+
+        if (ok)
+        {
+            dimmerOn = newOn;
+            lastBright = target;
+            errCount = 0;
+        }
+        else
+        {
+            if (errCount < MAX_ERR_COUNT)
+                errCount++;
+        }
+
+        return ok;
     }
-}
 
+    return true;
+}
 
 void setup()
 {
-    Ethernet.begin(ip, dns, gateway, subnet);
+    Ethernet.begin(ip, gateway, subnet);
 
-    watchdog.start(8000); // 8 s watchdog
+    //Ethernet.setRetransmissionTimeout(50);
+    //Ethernet.setRetransmissionCount(3);
+
+    ethernetClientDimmer1.setTimeout(HTTP_TIMEOUT_MS);
+    ethernetClientDimmer2.setTimeout(HTTP_TIMEOUT_MS);
+
+    ethernetClientDimmer1.setSocketTimeout(HTTP_TIMEOUT_MS);
+    ethernetClientDimmer2.setSocketTimeout(HTTP_TIMEOUT_MS);
+
+    httpClientDimmer1.setHttpResponseTimeout(HTTP_TIMEOUT_MS);
+    httpClientDimmer2.setHttpResponseTimeout(HTTP_TIMEOUT_MS);
+
+    watchdog.start(30000);
 }
-
 
 void loop()
 {
+    bool ethernetUp = (Ethernet.linkStatus() != LinkOFF);
+
+    if (!ethernetUp)
+    {
+        ethernetWasUp = false;
+
+        Ethernet.begin(ip, gateway, subnet);
+        delay(RECONNECT_DELAY_MS);
+    }
+    else
+    {
+        if (!ethernetWasUp)
+        {
+            forceDimmerSync = true;
+            ethernetWasUp = true;
+        }
+
+        bool syncOK = true;
+
+        syncOK &= handleDimmer(
+            httpClientDimmer1,
+            PLCOut.dimmer11Control,
+            lastBright11,
+            dimmer11On,
+            0,
+            errCount11,
+            forceDimmerSync);
+
+        delay(INTER_DIMMER_DELAY_MS);
+
+        syncOK &= handleDimmer(
+            httpClientDimmer1,
+            PLCOut.dimmer12Control,
+            lastBright12,
+            dimmer12On,
+            1,
+            errCount12,
+            forceDimmerSync);
+
+        delay(INTER_DIMMER_DELAY_MS);
+
+        syncOK &= handleDimmer(
+            httpClientDimmer2,
+            PLCOut.dimmer21Control,
+            lastBright21,
+            dimmer21On,
+            0,
+            errCount21,
+            forceDimmerSync);
+
+        delay(INTER_DIMMER_DELAY_MS);
+
+        syncOK &= handleDimmer(
+            httpClientDimmer2,
+            PLCOut.dimmer22Control,
+            lastBright22,
+            dimmer22On,
+            1,
+            errCount22,
+            forceDimmerSync);
+
+        if (forceDimmerSync && syncOK)
+        {
+            forceDimmerSync = false;
+        }
+    }
+
+    delay(LOOP_DELAY_MS);
     watchdog.kick();
-
-    Ethernet.maintain();
-
-    handleDimmer(httpClientDimmer1, PLCOut.dimmer11Control, lastBright11, dimmer11On, 0); //1st Channel Shelly 
-    handleDimmer(httpClientDimmer1, PLCOut.dimmer12Control, lastBright12, dimmer12On, 1); //2nd Channel Shelly
-
-    delay(100);
-}
-
-
-extern "C" void RPC_LightOn()
-{
-    sendRequest(httpClientDimmer1, "/rpc/Light.Set?id=0&on=true");
 }
